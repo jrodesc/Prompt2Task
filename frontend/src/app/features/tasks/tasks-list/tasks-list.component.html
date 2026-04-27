@@ -1,0 +1,109 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard" title="Dashboard">
+    <mat-icon>dashboard</mat-icon>
+  </button>
+  <span>Mis Tareas</span>
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="logout()" title="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="tasks-container">
+  <!-- Filters -->
+  <div class="filters-row">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar</mat-label>
+      <input matInput [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar tareas..." />
+      <button mat-icon-button matSuffix (click)="applySearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="filters.status" (ngModelChange)="load()">
+        <mat-option value="">Todos</mat-option>
+        @for (s of statuses; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prioridad</mat-label>
+      <mat-select [(ngModel)]="filters.priority" (ngModelChange)="load()">
+        <mat-option value="">Todas</mat-option>
+        @for (p of priorities; track p) {
+          <mat-option [value]="p">{{ p }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <mat-select [(ngModel)]="filters.category" (ngModelChange)="load()">
+        <mat-option value="">Todas</mat-option>
+        @for (c of categories; track c) {
+          <mat-option [value]="c">{{ c }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button (click)="clearFilters()">
+      <mat-icon>clear</mat-icon> Limpiar
+    </button>
+
+    <button mat-raised-button color="primary" routerLink="/tasks/new">
+      <mat-icon>add</mat-icon> Nueva
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-center"><mat-spinner /></div>
+  } @else if (tasks().length === 0) {
+    <div class="empty-state">
+      <mat-icon>task_alt</mat-icon>
+      <p>No hay tareas. ¡Crea la primera!</p>
+    </div>
+  } @else {
+    <div class="tasks-grid">
+      @for (task of tasks(); track task.id) {
+        <mat-card class="task-card">
+          <mat-card-header>
+            <mat-card-title>{{ task.title }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ task.category }}
+              @if (task.projectName) { · {{ task.projectName }} }
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (task.description) {
+              <p class="task-description">{{ task.description }}</p>
+            }
+            <div class="task-chips">
+              <span class="chip" [class]="'status-' + task.status">{{ task.status }}</span>
+              <span class="chip priority-chip" [style.background]="priorityColor(task.priority)">{{ task.priority }}</span>
+            </div>
+            @if (task.dueDate) {
+              <p class="due-date"><mat-icon>event</mat-icon> {{ task.dueDate | date:'dd/MM/yyyy' }}</p>
+            }
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary" [routerLink]="['/tasks', task.id]">
+              <mat-icon>visibility</mat-icon> Ver
+            </button>
+            <button mat-button [routerLink]="['/tasks', task.id, 'edit']">
+              <mat-icon>edit</mat-icon> Editar
+            </button>
+            <button mat-button color="warn" (click)="delete(task)">
+              <mat-icon>delete</mat-icon> Eliminar
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

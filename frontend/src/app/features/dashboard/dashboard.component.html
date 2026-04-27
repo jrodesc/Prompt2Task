@@ -1,0 +1,94 @@
+<mat-toolbar color="primary">
+  <span>Prompt2Task</span>
+  <span class="spacer"></span>
+  <span class="user-name">{{ auth.currentUser()?.name }}</span>
+  <button mat-icon-button (click)="logout()" title="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <button mat-raised-button color="primary" routerLink="/tasks/new">
+      <mat-icon>add</mat-icon> Nueva Tarea
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-center">
+      <mat-spinner />
+    </div>
+  } @else if (metrics()) {
+    <div class="metrics-grid">
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.total }}</div>
+          <div class="metric-label">Total</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card todo">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.todo }}</div>
+          <div class="metric-label">Por hacer</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card in-progress">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.in_progress }}</div>
+          <div class="metric-label">En progreso</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card done">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.done }}</div>
+          <div class="metric-label">Completadas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card blocked">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.blocked }}</div>
+          <div class="metric-label">Bloqueadas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card urgent">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.urgent }}</div>
+          <div class="metric-label">Urgentes</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card overdue">
+        <mat-card-content>
+          <div class="metric-value">{{ metrics()!.totals.overdue }}</div>
+          <div class="metric-label">Vencidas</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    @if (metrics()!.byCategory.length > 0) {
+      <h2>Por categoría</h2>
+      <div class="category-grid">
+        @for (cat of metrics()!.byCategory; track cat.category) {
+          <mat-card class="category-card">
+            <mat-card-content>
+              <span class="category-name">{{ cat.category }}</span>
+              <span class="category-count">{{ cat.count }}</span>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    }
+  }
+
+  <div class="go-tasks">
+    <button mat-stroked-button color="primary" routerLink="/tasks">
+      <mat-icon>list</mat-icon> Ver todas las tareas
+    </button>
+  </div>
+</div>

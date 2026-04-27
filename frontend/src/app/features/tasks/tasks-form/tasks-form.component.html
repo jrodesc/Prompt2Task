@@ -1,0 +1,78 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/tasks" title="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>{{ isEdit ? 'Editar Tarea' : 'Nueva Tarea' }}</span>
+</mat-toolbar>
+
+<div class="form-container">
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="task-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título *</mat-label>
+          <input matInput formControlName="title" />
+          @if (form.get('title')?.hasError('required')) {
+            <mat-error>El título es requerido</mat-error>
+          } @else if (form.get('title')?.hasError('maxlength')) {
+            <mat-error>Máximo 200 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" rows="4"></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statuses; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Prioridad</mat-label>
+            <mat-select formControlName="priority">
+              @for (p of priorities; track p) {
+                <mat-option [value]="p">{{ p }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="category">
+              @for (c of categories; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha límite</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dueDate" />
+            <mat-datepicker-toggle matIconSuffix [for]="picker" />
+            <mat-datepicker #picker />
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/tasks">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading || form.invalid">
+            @if (loading) {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ isEdit ? 'Guardar cambios' : 'Crear tarea' }}
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

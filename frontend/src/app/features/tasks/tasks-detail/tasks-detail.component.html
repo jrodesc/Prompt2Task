@@ -1,0 +1,47 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/tasks" title="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>Detalle de Tarea</span>
+</mat-toolbar>
+
+<div class="detail-container">
+  @if (loading()) {
+    <div class="loading-center"><mat-spinner /></div>
+  } @else if (task()) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ task()!.title }}</mat-card-title>
+        <mat-card-subtitle>{{ task()!.category }} · {{ task()!.projectName ?? 'Sin proyecto' }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chips-row">
+          <span class="chip" [class]="'status-' + task()!.status">{{ task()!.status }}</span>
+          <span class="chip priority-chip-{{ task()!.priority }}">{{ task()!.priority }}</span>
+        </div>
+
+        @if (task()!.description) {
+          <p class="description">{{ task()!.description }}</p>
+        }
+
+        <div class="meta">
+          @if (task()!.dueDate) {
+            <p><mat-icon>event</mat-icon> Vence: {{ task()!.dueDate | date:'dd/MM/yyyy' }}</p>
+          }
+          <p><mat-icon>schedule</mat-icon> Creada: {{ task()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p><mat-icon>update</mat-icon> Actualizada: {{ task()!.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-raised-button color="primary" [routerLink]="['/tasks', task()!.id, 'edit']">
+          <mat-icon>edit</mat-icon> Editar
+        </button>
+        <button mat-raised-button color="warn" (click)="delete()">
+          <mat-icon>delete</mat-icon> Eliminar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

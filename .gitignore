@@ -1,0 +1,47 @@
+# Project docs
+ARCHITECTURE.md
+
+# ─── Node / npm ───────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
+
+# ─── Environment & secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Backend build ────────────────────────────────────────────────────────────
+prompt2task-backend/dist/
+
+# ─── Angular / Frontend ───────────────────────────────────────────────────────
+prompt2task-frontend/dist/
+prompt2task-frontend/.angular/
+prompt2task-frontend/.angular/cache/
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editors ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Coverage & test output ───────────────────────────────────────────────────
+coverage/
+.nyc_output/

@@ -1,0 +1,62 @@
+.detail-container {
+  max-width: 700px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.chips-row {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.chip {
+  padding: 3px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.status-todo { background: #607d8b; }
+.status-in_progress { background: #1976d2; }
+.status-done { background: #388e3c; }
+.status-blocked { background: #d32f2f; }
+
+.priority-chip-low { background: #8bc34a; color: white; padding: 3px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.priority-chip-medium { background: #ff9800; color: white; padding: 3px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.priority-chip-high { background: #f44336; color: white; padding: 3px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.priority-chip-urgent { background: #9c27b0; color: white; padding: 3px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+
+.description {
+  color: #444;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.meta {
+  margin-top: 16px;
+  p {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0;
+
+    mat-icon { font-size: 18px; height: 18px; width: 18px; }
+  }
+}
+
+mat-card-actions {
+  display: flex;
+  gap: 12px;
+  padding: 8px 16px 16px;
+}
