@@ -3,32 +3,108 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--bg);
 }
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
-  padding: 16px;
+  max-width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.auth-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 4px;
+}
+
+.auth-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 0 28px;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 14px;
 }
 
-.full-width {
-  width: 100%;
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.error-msg {
-  color: #f44336;
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
   font-size: 14px;
-  margin: 0;
+  padding: 10px 14px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+
+  &::placeholder { color: var(--text-muted); }
+  &:focus { outline: none; border-color: rgba(99,102,241,0.5); }
 }
 
-mat-card-actions {
+.auth-error {
+  padding: 10px 14px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-sm);
+  color: #f87171;
+  font-size: 13px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover:not(:disabled) { background: var(--accent-dim); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.auth-footer {
   text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+
+  a { color: #818cf8; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } }
 }

@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   priority ENUM('low','medium','high','urgent') DEFAULT 'medium',
   category ENUM('frontend','backend','database','devops','documentation','other') DEFAULT 'other',
   dueDate DATE,
+  archived BOOLEAN DEFAULT FALSE,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,

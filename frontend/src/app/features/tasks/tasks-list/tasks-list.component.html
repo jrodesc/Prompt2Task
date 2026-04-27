@@ -1,108 +1,146 @@
-<mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard" title="Dashboard">
-    <mat-icon>dashboard</mat-icon>
-  </button>
-  <span>Mis Tareas</span>
-  <span class="spacer"></span>
-  <button mat-icon-button (click)="logout()" title="Cerrar sesión">
-    <mat-icon>logout</mat-icon>
-  </button>
-</mat-toolbar>
+<div class="list-wrapper" [class.panel-open]="selectedTask()">
 
-<div class="tasks-container">
-  <!-- Filters -->
-  <div class="filters-row">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar</mat-label>
-      <input matInput [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar tareas..." />
-      <button mat-icon-button matSuffix (click)="applySearch()">
-        <mat-icon>search</mat-icon>
-      </button>
-    </mat-form-field>
+  <div class="list-scroll">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">{{ pageTitle }}</h1>
+        <p class="page-subtitle">{{ tasks().length }} tareas encontradas</p>
+      </div>
+      <a class="btn-primary" routerLink="/tasks/new">
+        <span class="material-icons">add</span> Nueva tarea
+      </a>
+    </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Estado</mat-label>
-      <mat-select [(ngModel)]="filters.status" (ngModelChange)="load()">
-        <mat-option value="">Todos</mat-option>
-        @for (s of statuses; track s) {
-          <mat-option [value]="s">{{ s }}</mat-option>
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <span class="material-icons search-icon">search</span>
+        <input class="search-input" [(ngModel)]="search" (keyup.enter)="load()" placeholder="Buscar tareas..." />
+      </div>
+
+      <select class="filter-select" [(ngModel)]="filters.status" (ngModelChange)="load()">
+        <option value="">Todo estado</option>
+        @for (s of statuses; track s) { <option [value]="s">{{ STATUS_LABELS[s] }}</option> }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="filters.priority" (ngModelChange)="load()">
+        <option value="">Toda prioridad</option>
+        @for (p of priorities; track p) { <option [value]="p">{{ PRIORITY_LABELS[p] }}</option> }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="filters.category" (ngModelChange)="load()">
+        <option value="">Toda categoría</option>
+        @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+
+      <button class="btn-ghost-sm-text" (click)="load()">Buscar</button>
+    </div>
+
+    <!-- List -->
+    @if (loading()) {
+      <div class="loading-center"><mat-spinner diameter="36" /></div>
+    } @else if (tasks().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">task_alt</span>
+        <p>No hay tareas. ¡Crea la primera!</p>
+        <a class="btn-primary" routerLink="/tasks/new">Nueva tarea</a>
+      </div>
+    } @else {
+      <div class="task-list">
+        @for (task of tasks(); track task.id) {
+          <div class="task-row" [class.selected]="selectedTask()?.id === task.id" (click)="selectTask(task)">
+            <div class="task-row-left">
+              <div class="task-row-status" [class]="'dot-' + task.status"></div>
+              <div class="task-row-body">
+                <div class="task-row-title">
+                  {{ task.title }}
+                  @if (task.isAIGenerated) { <span class="badge-ai">✨ IA</span> }
+                </div>
+                @if (task.description) {
+                  <div class="task-row-desc">{{ task.description | slice:0:80 }}{{ task.description!.length > 80 ? '…' : '' }}</div>
+                }
+                <div class="task-row-meta">
+                  <span class="badge priority-{{ task.priority }}">{{ PRIORITY_LABELS[task.priority] }}</span>
+                  <span class="badge status-{{ task.status }}">{{ STATUS_LABELS[task.status] }}</span>
+                  <span class="badge badge-cat">{{ task.category }}</span>
+                  @if (task.dueDate) {
+                    <span class="due-chip" [class.overdue]="isOverdue(task)">
+                      <span class="material-icons" style="font-size:12px">event</span>
+                      {{ task.dueDate | date:'dd/MM/yyyy' }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="task-row-actions" (click)="$event.stopPropagation()">
+              <a class="icon-btn" [routerLink]="['/tasks', task.id, 'edit']" title="Editar">
+                <span class="material-icons">edit</span>
+              </a>
+              <button class="icon-btn danger" (click)="delete(task)" title="Eliminar">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          </div>
         }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Prioridad</mat-label>
-      <mat-select [(ngModel)]="filters.priority" (ngModelChange)="load()">
-        <mat-option value="">Todas</mat-option>
-        @for (p of priorities; track p) {
-          <mat-option [value]="p">{{ p }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Categoría</mat-label>
-      <mat-select [(ngModel)]="filters.category" (ngModelChange)="load()">
-        <mat-option value="">Todas</mat-option>
-        @for (c of categories; track c) {
-          <mat-option [value]="c">{{ c }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <button mat-stroked-button (click)="clearFilters()">
-      <mat-icon>clear</mat-icon> Limpiar
-    </button>
-
-    <button mat-raised-button color="primary" routerLink="/tasks/new">
-      <mat-icon>add</mat-icon> Nueva
-    </button>
+      </div>
+    }
   </div>
 
-  @if (loading()) {
-    <div class="loading-center"><mat-spinner /></div>
-  } @else if (tasks().length === 0) {
-    <div class="empty-state">
-      <mat-icon>task_alt</mat-icon>
-      <p>No hay tareas. ¡Crea la primera!</p>
-    </div>
-  } @else {
-    <div class="tasks-grid">
-      @for (task of tasks(); track task.id) {
-        <mat-card class="task-card">
-          <mat-card-header>
-            <mat-card-title>{{ task.title }}</mat-card-title>
-            <mat-card-subtitle>
-              {{ task.category }}
-              @if (task.projectName) { · {{ task.projectName }} }
-            </mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content>
-            @if (task.description) {
-              <p class="task-description">{{ task.description }}</p>
-            }
-            <div class="task-chips">
-              <span class="chip" [class]="'status-' + task.status">{{ task.status }}</span>
-              <span class="chip priority-chip" [style.background]="priorityColor(task.priority)">{{ task.priority }}</span>
+  <!-- Detail panel -->
+  @if (selectedTask() || loadingDetail()) {
+    <div class="detail-panel">
+      @if (loadingDetail()) {
+        <div class="detail-loading"><mat-spinner diameter="32" /></div>
+      } @else if (selectedTask()) {
+        <div class="detail-content">
+          <div class="detail-header">
+            <div class="detail-badges">
+              @if (selectedTask()!.isAIGenerated) { <span class="badge-ai">✨ Generada por IA</span> }
             </div>
-            @if (task.dueDate) {
-              <p class="due-date"><mat-icon>event</mat-icon> {{ task.dueDate | date:'dd/MM/yyyy' }}</p>
-            }
-          </mat-card-content>
-
-          <mat-card-actions>
-            <button mat-button color="primary" [routerLink]="['/tasks', task.id]">
-              <mat-icon>visibility</mat-icon> Ver
+            <button class="close-btn" (click)="closePanel()">
+              <span class="material-icons">close</span>
             </button>
-            <button mat-button [routerLink]="['/tasks', task.id, 'edit']">
-              <mat-icon>edit</mat-icon> Editar
+          </div>
+          <h2 class="detail-title">{{ selectedTask()!.title }}</h2>
+          <div class="detail-chips">
+            <span class="badge status-{{ selectedTask()!.status }}">{{ STATUS_LABELS[selectedTask()!.status] }}</span>
+            <span class="badge priority-{{ selectedTask()!.priority }}">{{ PRIORITY_LABELS[selectedTask()!.priority] }}</span>
+            <span class="badge badge-cat">{{ selectedTask()!.category }}</span>
+          </div>
+          @if (selectedTask()!.description) {
+            <div class="detail-section">
+              <div class="detail-section-title">DESCRIPCIÓN</div>
+              <p class="detail-description">{{ selectedTask()!.description }}</p>
+            </div>
+          }
+          @if (selectedTask()!.subtasks && selectedTask()!.subtasks!.length > 0) {
+            <div class="detail-section">
+              <div class="detail-section-title">
+                SUBTAREAS
+                <span class="subtask-progress">{{ completedSubtasks(selectedTask()!) }}/{{ totalSubtasks(selectedTask()!) }}</span>
+              </div>
+              <div class="subtask-list">
+                @for (sub of selectedTask()!.subtasks!; track sub.id) {
+                  <div class="subtask-item" (click)="toggleSubtask(sub)">
+                    <div class="subtask-check" [class.checked]="sub.completed">
+                      @if (sub.completed) { <span class="material-icons check-icon">check</span> }
+                    </div>
+                    <span class="subtask-title" [class.done]="sub.completed">{{ sub.title }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <div class="detail-actions">
+            <a class="btn-outline" [routerLink]="['/tasks', selectedTask()!.id, 'edit']">
+              <span class="material-icons">edit</span> Editar
+            </a>
+            <button class="btn-danger-sm" (click)="delete(selectedTask()!)">
+              <span class="material-icons">delete</span>
             </button>
-            <button mat-button color="warn" (click)="delete(task)">
-              <mat-icon>delete</mat-icon> Eliminar
-            </button>
-          </mat-card-actions>
-        </mat-card>
+          </div>
+        </div>
       }
     </div>
   }

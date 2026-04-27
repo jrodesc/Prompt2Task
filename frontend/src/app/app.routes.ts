@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { LayoutComponent } from './shared/components/layout/layout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -19,42 +20,34 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'dashboard',
+    path: '',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
-  },
-  {
-    path: 'tasks',
-    canActivate: [authGuard],
+    component: LayoutComponent,
     children: [
       {
-        path: '',
+        path: 'dashboard',
         loadComponent: () =>
-          import('./features/tasks/tasks-list/tasks-list.component').then(
-            (m) => m.TasksListComponent
-          ),
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
       {
-        path: 'new',
+        path: 'tasks',
         loadComponent: () =>
-          import('./features/tasks/tasks-form/tasks-form.component').then(
-            (m) => m.TasksFormComponent
-          ),
+          import('./features/tasks/tasks-list/tasks-list.component').then((m) => m.TasksListComponent),
       },
       {
-        path: ':id/edit',
+        path: 'tasks/new',
         loadComponent: () =>
-          import('./features/tasks/tasks-form/tasks-form.component').then(
-            (m) => m.TasksFormComponent
-          ),
+          import('./features/tasks/tasks-form/tasks-form.component').then((m) => m.TasksFormComponent),
       },
       {
-        path: ':id',
+        path: 'tasks/:id/edit',
         loadComponent: () =>
-          import('./features/tasks/tasks-detail/tasks-detail.component').then(
-            (m) => m.TasksDetailComponent
-          ),
+          import('./features/tasks/tasks-form/tasks-form.component').then((m) => m.TasksFormComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
     ],
   },

@@ -1,94 +1,195 @@
-<mat-toolbar color="primary">
-  <span>Prompt2Task</span>
-  <span class="spacer"></span>
-  <span class="user-name">{{ auth.currentUser()?.name }}</span>
-  <button mat-icon-button (click)="logout()" title="Cerrar sesión">
-    <mat-icon>logout</mat-icon>
-  </button>
-</mat-toolbar>
+<div class="dashboard-wrapper" [class.panel-open]="selectedTask()">
 
-<div class="dashboard">
-  <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <button mat-raised-button color="primary" routerLink="/tasks/new">
-      <mat-icon>add</mat-icon> Nueva Tarea
-    </button>
-  </div>
+  <!-- ── Main scroll area ──────────────────────────────────────────── -->
+  <div class="dashboard-scroll">
 
-  @if (loading()) {
-    <div class="loading-center">
-      <mat-spinner />
-    </div>
-  } @else if (metrics()) {
-    <div class="metrics-grid">
-      <mat-card class="metric-card">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.total }}</div>
-          <div class="metric-label">Total</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card todo">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.todo }}</div>
-          <div class="metric-label">Por hacer</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card in-progress">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.in_progress }}</div>
-          <div class="metric-label">En progreso</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card done">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.done }}</div>
-          <div class="metric-label">Completadas</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card blocked">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.blocked }}</div>
-          <div class="metric-label">Bloqueadas</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card urgent">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.urgent }}</div>
-          <div class="metric-label">Urgentes</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="metric-card overdue">
-        <mat-card-content>
-          <div class="metric-value">{{ metrics()!.totals.overdue }}</div>
-          <div class="metric-label">Vencidas</div>
-        </mat-card-content>
-      </mat-card>
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Tablero de tareas</h1>
+        <p class="page-subtitle">Genera tareas con IA o créalas manualmente</p>
+      </div>
+      <a class="btn-primary" routerLink="/tasks/new">
+        <span class="material-icons">add</span> Nueva tarea
+      </a>
     </div>
 
-    @if (metrics()!.byCategory.length > 0) {
-      <h2>Por categoría</h2>
-      <div class="category-grid">
-        @for (cat of metrics()!.byCategory; track cat.category) {
-          <mat-card class="category-card">
-            <mat-card-content>
-              <span class="category-name">{{ cat.category }}</span>
-              <span class="category-count">{{ cat.count }}</span>
-            </mat-card-content>
-          </mat-card>
+    <!-- AI section -->
+    <div class="ai-section">
+      <div class="ai-section-header">
+        <span class="ai-icon">🤖</span>
+        <span class="ai-title">GENERAR TAREAS CON IA</span>
+      </div>
+      <textarea
+        class="ai-textarea"
+        [(ngModel)]="aiPrompt"
+        placeholder="Describe lo que necesitas hacer... ej: 'Preparar presentación del proyecto para el viernes con análisis de usuarios y mockups'"
+        rows="4"
+        (keydown.ctrl.enter)="generateWithAI()"
+      ></textarea>
+      <div class="ai-actions">
+        <button class="btn-ghost" (click)="clearAI()" [disabled]="loadingAI()">Limpiar</button>
+        <button class="btn-ai" (click)="generateWithAI()" [disabled]="loadingAI() || !aiPrompt.trim()">
+          @if (loadingAI()) {
+            <span class="spin material-icons">refresh</span> Generando...
+          } @else {
+            <span>✨</span> Generar tareas
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Kanban board -->
+    @if (loading()) {
+      <div class="loading-center">
+        <mat-spinner diameter="40" />
+      </div>
+    } @else {
+      <div class="kanban-board">
+        @for (col of columnTasks(); track col.status) {
+          <div class="kanban-column">
+            <div class="column-header" [class]="col.colorClass">
+              <div class="col-header-left">
+                <span class="material-icons col-icon">{{ col.icon }}</span>
+                <span class="col-label">{{ col.label | uppercase }}</span>
+              </div>
+              <span class="col-count">{{ col.items.length }}</span>
+            </div>
+
+            <div class="column-tasks">
+              @for (task of col.items; track task.id) {
+                <div
+                  class="task-card"
+                  [class.selected]="selectedTask()?.id === task.id"
+                  (click)="selectTask(task)"
+                >
+                  @if (task.isAIGenerated) {
+                    <span class="badge-ai">✨ Generada por IA</span>
+                  }
+                  <h4 class="task-title">{{ task.title }}</h4>
+                  <div class="task-meta">
+                    <span class="badge priority-{{ task.priority }}">
+                      {{ PRIORITY_LABELS[task.priority] }}
+                    </span>
+                    @if (task.dueDate) {
+                      <span class="due-chip" [class.overdue]="isOverdue(task)">
+                        <span class="material-icons" style="font-size:12px">event</span>
+                        {{ dueDateLabel(task.dueDate) }}
+                      </span>
+                    }
+                  </div>
+                  @if (task.category) {
+                    <span class="category-tag">{{ task.category }}</span>
+                  }
+                </div>
+              }
+
+              @if (col.items.length === 0) {
+                <div class="empty-col">Sin tareas</div>
+              }
+            </div>
+          </div>
         }
       </div>
     }
+  </div>
+
+  <!-- ── Detail panel ──────────────────────────────────────────────── -->
+  @if (selectedTask() || loadingDetail()) {
+    <div class="detail-panel">
+      @if (loadingDetail()) {
+        <div class="detail-loading"><mat-spinner diameter="32" /></div>
+      } @else if (selectedTask()) {
+        <div class="detail-content">
+
+          <!-- Panel header -->
+          <div class="detail-header">
+            <div class="detail-badges">
+              @if (selectedTask()!.isAIGenerated) {
+                <span class="badge-ai">✨ Generada por IA</span>
+              }
+            </div>
+            <button class="close-btn" (click)="closePanel()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <h2 class="detail-title">{{ selectedTask()!.title }}</h2>
+
+          <!-- Status + Priority -->
+          <div class="detail-chips">
+            <span class="badge status-{{ selectedTask()!.status }}">{{ STATUS_LABELS[selectedTask()!.status] }}</span>
+            <span class="badge priority-{{ selectedTask()!.priority }}">{{ PRIORITY_LABELS[selectedTask()!.priority] }}</span>
+            <span class="badge badge-cat">{{ selectedTask()!.category }}</span>
+          </div>
+
+          <!-- Description -->
+          @if (selectedTask()!.description) {
+            <div class="detail-section">
+              <div class="detail-section-title">DESCRIPCIÓN</div>
+              <p class="detail-description">{{ selectedTask()!.description }}</p>
+            </div>
+          }
+
+          <!-- Subtasks -->
+          @if (selectedTask()!.subtasks && selectedTask()!.subtasks!.length > 0) {
+            <div class="detail-section">
+              <div class="detail-section-title">
+                SUBTAREAS
+                <span class="subtask-progress">
+                  {{ completedSubtasks(selectedTask()!) }}/{{ totalSubtasks(selectedTask()!) }}
+                </span>
+              </div>
+              <div class="subtask-list">
+                @for (sub of selectedTask()!.subtasks!; track sub.id) {
+                  <div class="subtask-item" (click)="toggleSubtask(sub)">
+                    <div class="subtask-check" [class.checked]="sub.completed">
+                      @if (sub.completed) {
+                        <span class="material-icons check-icon">check</span>
+                      }
+                    </div>
+                    <span class="subtask-title" [class.done]="sub.completed">{{ sub.title }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Meta info -->
+          <div class="detail-section">
+            <div class="detail-section-title">PRIORIDAD</div>
+            <span class="badge priority-{{ selectedTask()!.priority }}">
+              {{ PRIORITY_LABELS[selectedTask()!.priority] }}
+            </span>
+          </div>
+
+          @if (selectedTask()!.dueDate) {
+            <div class="detail-section">
+              <div class="detail-section-title">FECHA LÍMITE</div>
+              <span class="due-chip" [class.overdue]="isOverdue(selectedTask()!)">
+                <span class="material-icons" style="font-size:14px">event</span>
+                {{ dueDateLabel(selectedTask()!.dueDate) }}
+                <span class="due-full">({{ selectedTask()!.dueDate | date:'dd/MM/yyyy' }})</span>
+              </span>
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="detail-actions">
+            <a class="btn-outline" [routerLink]="['/tasks', selectedTask()!.id, 'edit']">
+              <span class="material-icons">edit</span> Editar
+            </a>
+            <button class="btn-ghost-sm" (click)="archiveTask(selectedTask()!)">
+              <span class="material-icons">inventory_2</span>
+            </button>
+            <button class="btn-danger-sm" (click)="deleteTask(selectedTask()!)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
   }
 
-  <div class="go-tasks">
-    <button mat-stroked-button color="primary" routerLink="/tasks">
-      <mat-icon>list</mat-icon> Ver todas las tareas
-    </button>
-  </div>
 </div>
