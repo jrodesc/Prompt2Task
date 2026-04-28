@@ -1,5 +1,10 @@
 <div class="app-shell">
-  <aside class="sidebar">
+
+  @if (sidebarOpen) {
+    <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  }
+
+  <aside class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-brand">
       <span class="brand-icon">⚡</span>
       <span class="brand-name">Prompt2Task</span>
@@ -13,6 +18,7 @@
           [queryParams]="item.queryParams ?? {}"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          (click)="closeSidebar()"
         >
           <span class="material-icons nav-icon">{{ item.icon }}</span>
           <span>{{ item.label }}</span>
@@ -35,6 +41,13 @@
   </aside>
 
   <main class="main-area">
+    <div class="mobile-topbar">
+      <button class="hamburger-btn" (click)="toggleSidebar()">
+        <span class="material-icons">menu</span>
+      </button>
+      <span class="mobile-brand">⚡ Prompt2Task</span>
+    </div>
     <router-outlet />
   </main>
+
 </div>

@@ -74,6 +74,11 @@
               </div>
             </div>
             <div class="task-row-actions" (click)="$event.stopPropagation()">
+              @if (filters.archived) {
+                <button class="icon-btn" (click)="unarchive(task)" title="Desarchivar">
+                  <span class="material-icons">unarchive</span>
+                </button>
+              }
               <a class="icon-btn" [routerLink]="['/tasks', task.id, 'edit']" title="Editar">
                 <span class="material-icons">edit</span>
               </a>
@@ -133,6 +138,11 @@
             </div>
           }
           <div class="detail-actions">
+            @if (filters.archived) {
+              <button class="btn-outline" (click)="unarchive(selectedTask()!)">
+                <span class="material-icons">unarchive</span> Desarchivar
+              </button>
+            }
             <a class="btn-outline" [routerLink]="['/tasks', selectedTask()!.id, 'edit']">
               <span class="material-icons">edit</span> Editar
             </a>

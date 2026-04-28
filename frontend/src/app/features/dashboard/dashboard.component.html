@@ -92,6 +92,38 @@
         }
       </div>
     }
+
+    <!-- Stats Section -->
+    @if (!loading() && tasks().length > 0) {
+      <div class="stats-section">
+        <div class="stats-section-header">
+          <span class="material-icons">bar_chart</span>
+          <span class="stats-title">ESTADÍSTICAS</span>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-box">
+            <div class="chart-label">Tareas por estado</div>
+            <div class="chart-wrap">
+              <canvas baseChart [type]="'bar'" [data]="statusChartData()" [options]="chartOptions" [legend]="false"></canvas>
+            </div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-label">Tareas por prioridad</div>
+            <div class="chart-wrap">
+              <canvas baseChart [type]="'bar'" [data]="priorityChartData()" [options]="chartOptions" [legend]="false"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-box chart-box-full">
+          <div class="chart-label">Tareas por categoría</div>
+          <div class="chart-wrap chart-wrap-lg">
+            <canvas baseChart [type]="'bar'" [data]="categoryChartData()" [options]="chartOptions" [legend]="false"></canvas>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- ── Detail panel ──────────────────────────────────────────────── -->

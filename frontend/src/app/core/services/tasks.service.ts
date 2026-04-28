@@ -37,6 +37,10 @@ export class TasksService {
     return this.http.put<Task>(`${this.base}/${id}`, { archived: true });
   }
 
+  unarchive(id: number) {
+    return this.http.put<Task>(`${this.base}/${id}`, { archived: false });
+  }
+
   getMetrics() {
     return this.http.get<TaskMetrics>(`${this.base}/metrics`);
   }

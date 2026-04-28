@@ -19,6 +19,10 @@ interface NavItem {
   styleUrl: './layout.component.scss',
 })
 export class LayoutComponent {
+  sidebarOpen = false;
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar()  { this.sidebarOpen = false; }
+
   readonly navItems: NavItem[] = [
     { label: 'Tablero', icon: 'dashboard', route: '/dashboard', exact: true },
     { label: 'Todas las tareas', icon: 'format_list_bulleted', route: '/tasks', exact: true },

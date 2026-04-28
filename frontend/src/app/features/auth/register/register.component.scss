@@ -96,3 +96,7 @@
 
   a { color: #818cf8; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } }
 }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 24px 20px; }
+}

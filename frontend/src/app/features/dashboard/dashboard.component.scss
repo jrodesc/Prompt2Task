@@ -1,3 +1,10 @@
+:host {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .dashboard-wrapper {
   display: flex;
   height: 100%;
@@ -13,6 +20,7 @@
 .dashboard-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 28px 24px;
   min-width: 0;
 }
@@ -464,6 +472,102 @@
     color: var(--text-muted);
     text-decoration: line-through;
   }
+}
+
+/* ── Stats Section ───────────────────────────────────────────────── */
+.stats-section {
+  margin-top: 28px;
+}
+
+.stats-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .material-icons { font-size: 16px; color: var(--text-muted); }
+  .stats-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow: hidden;
+  min-width: 0;
+
+  &.chart-box-full { width: 100%; }
+}
+
+.chart-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chart-wrap {
+  position: relative;
+  height: 180px;
+}
+
+.chart-wrap-lg {
+  height: 160px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  .kanban-board { grid-template-columns: 1fr 1fr; }
+  .charts-grid  { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-scroll { padding: 16px; }
+
+  .detail-panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    border-left: none;
+    z-index: 50;
+    animation: slideUp 0.25s ease;
+  }
+
+  .stats-section { margin-top: 20px; padding-bottom: 24px; }
+  .chart-wrap    { height: 160px; }
+  .chart-wrap-lg { height: 140px; }
+}
+
+@media (max-width: 600px) {
+  .kanban-board { grid-template-columns: 1fr; }
+
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .ai-textarea { font-size: 13px; }
 }
 
 /* ── Detail actions ──────────────────────────────────────────────── */

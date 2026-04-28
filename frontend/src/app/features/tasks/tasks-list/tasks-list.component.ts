@@ -104,6 +104,16 @@ export class TasksListComponent implements OnInit {
     });
   }
 
+  unarchive(task: Task) {
+    this.tasksService.unarchive(task.id).subscribe({
+      next: () => {
+        this.tasks.update((l) => l.filter((t) => t.id !== task.id));
+        if (this.selectedTask()?.id === task.id) this.selectedTask.set(null);
+        this.snack.open('Tarea desarchivada', 'OK', { duration: 3000 });
+      },
+    });
+  }
+
   isOverdue(task: Task): boolean {
     return !!task.dueDate && task.status !== 'done' && new Date(task.dueDate) < new Date();
   }

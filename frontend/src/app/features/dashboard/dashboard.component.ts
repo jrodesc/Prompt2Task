@@ -4,8 +4,12 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgChartsModule } from 'ng2-charts';
+import { Chart, ChartData, ChartOptions, registerables } from 'chart.js';
 import { TasksService } from '../../core/services/tasks.service';
 import { Task, TaskStatus, Subtask, PRIORITY_LABELS, STATUS_LABELS } from '../../core/models/task.model';
+
+Chart.register(...registerables);
 
 interface KanbanColumn {
   status: TaskStatus;
@@ -17,7 +21,7 @@ interface KanbanColumn {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatSnackBarModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatSnackBarModule, MatProgressSpinnerModule, NgChartsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -45,6 +49,66 @@ export class DashboardComponent implements OnInit {
       ...col,
       items: all.filter((t) => t.status === col.status),
     }));
+  });
+
+  readonly chartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.y} tareas` } } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
+      y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 11 }, stepSize: 1 } },
+    },
+  };
+
+  statusChartData = computed((): ChartData<'bar'> => {
+    const all = this.tasks();
+    return {
+      labels: ['Por Hacer', 'En Progreso', 'Completadas', 'Bloqueadas'],
+      datasets: [{
+        data: [
+          all.filter(t => t.status === 'todo').length,
+          all.filter(t => t.status === 'in_progress').length,
+          all.filter(t => t.status === 'done').length,
+          all.filter(t => t.status === 'blocked').length,
+        ],
+        backgroundColor: ['rgba(129,140,248,0.75)', 'rgba(96,165,250,0.75)', 'rgba(74,222,128,0.75)', 'rgba(248,113,113,0.75)'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }],
+    };
+  });
+
+  priorityChartData = computed((): ChartData<'bar'> => {
+    const all = this.tasks();
+    return {
+      labels: ['Baja', 'Media', 'Alta', 'Urgente'],
+      datasets: [{
+        data: [
+          all.filter(t => t.priority === 'low').length,
+          all.filter(t => t.priority === 'medium').length,
+          all.filter(t => t.priority === 'high').length,
+          all.filter(t => t.priority === 'urgent').length,
+        ],
+        backgroundColor: ['rgba(74,222,128,0.75)', 'rgba(250,204,21,0.75)', 'rgba(251,146,60,0.75)', 'rgba(248,113,113,0.75)'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }],
+    };
+  });
+
+  categoryChartData = computed((): ChartData<'bar'> => {
+    const all = this.tasks();
+    return {
+      labels: ['Frontend', 'Backend', 'Base de datos', 'DevOps', 'Docs', 'Otro'],
+      datasets: [{
+        data: (['frontend', 'backend', 'database', 'devops', 'documentation', 'other'] as const)
+          .map(c => all.filter(t => t.category === c).length),
+        backgroundColor: 'rgba(129,140,248,0.7)',
+        borderRadius: 6,
+        borderSkipped: false,
+      }],
+    };
   });
 
   constructor(private tasksService: TasksService, private snack: MatSnackBar) {}
