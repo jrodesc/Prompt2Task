@@ -26,8 +26,7 @@ export class LayoutComponent {
   readonly navItems: NavItem[] = [
     { label: 'Tablero', icon: 'dashboard', route: '/dashboard', exact: true },
     { label: 'Todas las tareas', icon: 'format_list_bulleted', route: '/tasks', exact: true },
-    { label: 'Generadas por IA', icon: 'auto_awesome', route: '/tasks', queryParams: { ai: 'true' } },
-    { label: 'Importantes', icon: 'star', route: '/tasks', queryParams: { priority: 'urgent' } },
+{ label: 'Importantes', icon: 'star', route: '/tasks', queryParams: { priority: 'urgent' } },
     { label: 'Completadas', icon: 'task_alt', route: '/tasks', queryParams: { status: 'done' } },
     { label: 'Archivadas', icon: 'inventory_2', route: '/tasks', queryParams: { archived: 'true' } },
   ];

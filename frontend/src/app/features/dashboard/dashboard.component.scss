@@ -570,6 +570,41 @@
   .ai-textarea { font-size: 13px; }
 }
 
+/* ── Drag & Drop ─────────────────────────────────────────────────── */
+.cdk-drag-preview {
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0.95;
+  cursor: grabbing;
+}
+
+.cdk-drag-placeholder {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--radius-sm);
+  min-height: 60px;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-receiving {
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.task-card[cdkDrag] {
+  cursor: grab;
+}
+
 /* ── Detail actions ──────────────────────────────────────────────── */
 .detail-actions {
   display: flex;

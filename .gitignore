@@ -20,9 +20,8 @@ yarn.lock
 prompt2task-backend/dist/
 
 # ─── Angular / Frontend ───────────────────────────────────────────────────────
-prompt2task-frontend/dist/
-prompt2task-frontend/.angular/
-prompt2task-frontend/.angular/cache/
+frontend/dist/
+frontend/.angular/
 
 # ─── OS ───────────────────────────────────────────────────────────────────────
 .DS_Store

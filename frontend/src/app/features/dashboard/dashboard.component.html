@@ -13,8 +13,8 @@
         <span class="material-icons">add</span> Nueva tarea
       </a>
     </div>
-
-    <!-- AI section -->
+<!-- 
+     AI section 
     <div class="ai-section">
       <div class="ai-section-header">
         <span class="ai-icon">🤖</span>
@@ -38,6 +38,8 @@
         </button>
       </div>
     </div>
+-->
+    
 
     <!-- Kanban board -->
     @if (loading()) {
@@ -45,7 +47,7 @@
         <mat-spinner diameter="40" />
       </div>
     } @else {
-      <div class="kanban-board">
+      <div class="kanban-board" cdkDropListGroup>
         @for (col of columnTasks(); track col.status) {
           <div class="kanban-column">
             <div class="column-header" [class]="col.colorClass">
@@ -56,10 +58,15 @@
               <span class="col-count">{{ col.items.length }}</span>
             </div>
 
-            <div class="column-tasks">
+            <div class="column-tasks"
+              cdkDropList
+              [cdkDropListData]="col.status"
+              (cdkDropListDropped)="onDrop($event)">
               @for (task of col.items; track task.id) {
                 <div
                   class="task-card"
+                  cdkDrag
+                  [cdkDragData]="task"
                   [class.selected]="selectedTask()?.id === task.id"
                   (click)="selectTask(task)"
                 >

@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgChartsModule } from 'ng2-charts';
 import { Chart, ChartData, ChartOptions, registerables } from 'chart.js';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TasksService } from '../../core/services/tasks.service';
 import { Task, TaskStatus, Subtask, PRIORITY_LABELS, STATUS_LABELS } from '../../core/models/task.model';
 
@@ -21,7 +22,7 @@ interface KanbanColumn {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatSnackBarModule, MatProgressSpinnerModule, NgChartsModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatSnackBarModule, MatProgressSpinnerModule, NgChartsModule, DragDropModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -211,6 +212,19 @@ export class DashboardComponent implements OnInit {
     if (diff === 1) return 'Mañana';
     if (diff === -1) return 'Ayer';
     return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  }
+
+  onDrop(event: CdkDragDrop<TaskStatus>) {
+    if (event.previousContainer === event.container) return;
+    const task: Task = event.item.data;
+    const newStatus: TaskStatus = event.container.data;
+    this.tasks.update(list => list.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
+    this.tasksService.update(task.id, { status: newStatus }).subscribe({
+      error: () => {
+        this.tasks.update(list => list.map(t => t.id === task.id ? { ...t, status: task.status } : t));
+        this.snack.open('Error al mover tarea', 'OK', { duration: 3000 });
+      },
+    });
   }
 
   completedSubtasks(task: Task): number {
