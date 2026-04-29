@@ -2,6 +2,6 @@
   "buildCommand": "npm run build:prod",
   "outputDirectory": "dist/prompt2task-frontend/browser",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!.*\\..*).+)", "destination": "/" }
   ]
 }
